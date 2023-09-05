@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charts</title>
+    <style>
+        .charts_container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto;
+            gap: 10px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>disinfection plc readings' charts</h2>
+    <a href="{{ url_for('main_page')}}">go back</a>
+    <div class="charts_container">
+    <div>
+        <canvas id="lineChart1" height="400"></canvas>
+    </div>
+
+    <div>
+        <canvas id="lineChart2" height="400"></canvas>
+    </div>
+
+    <div>
+        <canvas id="lineChart3" height="400"></canvas>
+    </div>
+
+    <div>
+        <canvas id="lineChart4" height="400"></canvas>
+    </div>
+
+    <div>
+        <canvas id="lineChart5" height="400"></canvas>
+    </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io.connect("http://" + document.domain + ':' + location.port + '/dynamic')
+        var water_level;
+        var temperature;
+        var chlorination;
+        var concentration;
+        var ph;
+        socket.on('dis_data', function (data) {
+            water_level = data.dis_water_level;
+            temperature = data.dis_temperature;
+            chlorination = data.dis_chlorination;
+            concentration = data.dis_concentration;
+            ph = data.dis_ph;
+        });
+
+        function formatTime() {
+            var current_date = new Date();
+            var hour = current_date.getHours().toString().padStart(2, '0');
+            var minute = current_date.getMinutes().toString().padStart(2, '0');
+            var second = current_date.getSeconds().toString().padStart(2, '0');
+
+            return hour + ':' + minute + ':' + second;
+        }
+    </script>
+
+    <script src="../static/disinfection_linechart1.js"></script>
+    <script src="../static/disinfection_linechart2.js"></script>
+    <script src="../static/disinfection_linechart3.js"></script>
+    <script src="../static/disinfection_linechart4.js"></script>
+    <script src="../static/disinfection_linechart5.js"></script>
+</body>
+</html>

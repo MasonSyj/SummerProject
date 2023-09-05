@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Water Treatment Plant HMI</title>
+    <style>
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            grid-template-rows: auto;
+            gap: 10px;
+        }
+        .data_container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="alarm_sound">
+        <source src="../static/alarm.wav" type="audio/mpeg">
+        Your system does not support alarm
+    </audio>
+
+    <h1 style="margin: 10px;">HMI</h1>
+    <a href="{{url_for('logout')}}">Log out</a>
+
+    <div class="container">
+    <div class="data_container" style="grid-row: span 2;">
+        <div style="width: 300px">
+            <h2>filter part</h2>
+            <div id="water_level">water level(L): </div>
+            <div id="temperature">temperature: </div>
+            <div id="dissolved_solids">dissolved solids: </div>
+            <div id="turbidity">turbidity: </div>
+            <div id="gravel_efficiency">gravel efficiency(%): </div>
+            <div id="sand_efficiency">sand efficiency(%): </div>
+
+            <div id="filter">main control: </div>
+            <div id="sand">sand mode: </div>
+            <div id="gravel">gravel mode: </div>
+            <div id="flow_in">flow in valve: </div>
+            <div id="flow_out">flow out valve: </div>
+
+            main control: <br>
+            <button id="filter_on">start</button>
+            <button id="filter_off">close</button> <br>
+
+            sand filter control: <br>
+            <button id="sand_strong">strong</button>
+            <button id="sand_normal">normal</button>
+            <button id="sand_stop">stop</button><br>
+
+            gravel filter control: <br>
+            <button id="gravel_strong">strong</button>
+            <button id="gravel_normal">normal</button>
+            <button id="gravel_stop">stop</button><br>
+
+            flow in valve: <br>
+            <button id="flow_in_open">open</button>
+            <button id="flow_in_close">close</button> <br>
+
+            flow out valve: <br>
+            <button id="flow_out_open">open</button>
+            <button id="flow_out_close">close</button> <br>
+        </div>
+
+        <div style="width: 300px">
+            <h2>disinfection part</h2>
+            <div id="dis_water_level">water level(L): </div>
+            <div id="dis_temperature">temperature: </div>
+            <div id="chlorine">chlorine: </div>
+            <div id="expected_concentration">expected concentration: </div>
+            <div id="real_concentration">concentration: </div>
+            <div id="ph">pH: </div>
+            <div id="dis_running">running state: </div>
+            <div id="dis_flow_in">flow in valve: </div>
+            <div id="dis_flow_out">flow out valve: </div>
+            <div id="automatic">automatic: </div>
+
+            main control: <br>
+            <button id="dis_on">start</button>
+            <button id="dis_off">close</button> <br>
+
+            flow in valve: <br>
+            <button id="dis_flow_in_open">open</button>
+            <button id="dis_flow_in_close">close</button> <br>
+
+            flow out valve: <br>
+            <button id="dis_flow_out_open">open</button>
+            <button id="dis_flow_out_close">close</button> <br>
+
+            automatic: <br>
+            <button id="automatic_on">on</button>
+            <button id="automatic_off">off</button> <br>
+            <form id="dis_chr_form">
+                <label for="chlorine">chlorine:</label> <br>
+                <input type="number" id="chlorine_control" min="0" max="200" step="0.1" oninput="" />
+                <button type="submit">submit</button>
+            </form>
+            <form id="dis_con_form">
+                <label for="expected_concentration">concentration:</label> <br>
+                <input type="number" id="concentration_control" min="0.2" max="2" step="0.1" oninput="" />
+                <button type="submit">submit</button>
+            </form>
+        </div>
+
+        <div>
+            <h2>raw water part</h2>
+            <div id="rw_water_level">water level(L): </div>
+            <div id="rw_temperature">temperature: </div>
+            <div id="rw_pump_in_speed">pump in speed: </div>
+            <div id="rw_running">running: </div>
+            <div id="rw_flow_in">flow in valve: </div>
+            <div id="rw_flow_out">flow out valve: </div>
+
+            main control: <br>
+            <button id="rw_on">start</button>
+            <button id="rw_off">close</button> <br>
+
+            flow in valve: <br>
+            <button id="rw_flow_in_open">open</button>
+            <button id="rw_flow_in_close">close</button> <br>
+
+            flow out valve: <br>
+            <button id="rw_flow_out_open">open</button>
+            <button id="rw_flow_out_close">close</button> <br>
+            <form id="rw_form">
+                <label for="pump_in_speed">pump in speed(%):</label> <br>
+                <input type="number" id="pump_in_speed" min="0" max="100" step="10" oninput="" />
+                <button type="submit">submit</button>
+            </form>
+        </div>
+
+
+        <div>
+            <h2>storage water part</h2>
+            <div id="st_water_level">water level(L): </div>
+            <div id="st_temperature">temperature: </div>
+            <div id="st_pump_in_speed">pump in speed: </div>
+            <div id="st_running">main control: </div>
+            <div id="st_flow_in">flow in: </div>
+            <div id="st_flow_out">flow out: </div>
+            <div id="st_automatic">automatic: </div>
+
+            main control: <br>
+            <button id="st_on">start</button>
+            <button id="st_off">close</button> <br>
+
+            flow in valve: <br>
+            <button id="st_flow_in_open">open</button>
+            <button id="st_flow_in_close">close</button> <br>
+
+            flow out valve: <br>
+            <button id="st_flow_out_open">open</button>
+            <button id="st_flow_out_close">close</button> <br>
+
+            automatic switch: <br>
+            <button id="st_automatic_open">on</button>
+            <button id="st_automatic_close">off</button> <br>
+            <form id="st_form">
+                <label for="pump_out_speed">pump out speed(%):</label><br>
+                <input type="number" id="pump_out_speed" min="0" max="100" step="10" oninput="" />
+                <button type="submit">submit</button>
+            </form>
+        </div>
+    </div>
+    <div>
+        <object type="image/svg+xml" data="../static/water_tanks.svg" width="800" height="300"></object>
+    </div>
+    <div>
+        <h2>Charts: </h2>
+        <a href="{{ url_for('filter_charts_page') }}">filter plc</a>
+        <a href="{{ url_for('disinfection_charts_page') }}">disinfection plc</a>
+        <h2>Error Messages: </h2>
+        <button id="stop_alarm">stop alarm</button>
+        <textarea id="errors" style="width: 800px; height: 200px; resize: none;" readonly></textarea>
+    </div>
+    </div>
+
+
+    <script src="../static/alarm.js"></script>
+    <script src="../static/message.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+    <!-- scripts that deal with the svg graphs -->
+    <script>
+        const graph_socket = io.connect("http://" + document.domain + ':' + location.port + '/dynamic')
+        var filter_water_level;
+        graph_socket.on('update_data', function (data) {
+            filter_water_level = data.water_level;
+        });
+
+        var dis_water_level;
+        graph_socket.on('dis_data', function (data) {
+            dis_water_level = data.dis_water_level;
+        });
+
+        var rw_water_level;
+        graph_socket.on('rw_data', function (data) {
+            rw_water_level = data.rw_water_level;
+        })
+
+        var st_water_level;
+        graph_socket.on('st_data', function (data) {
+            st_water_level = data.st_water_level;
+        })
+    </script>
+    <script src="../static/graphs.js"></script>
+    <!-- end of part which deals with svg graphs -->
+
+    <!-- part deals with alarm sound and error message -->
+    <script>
+        error_message_socket = io.connect("http://" + document.domain + ':' + location.port + '/dynamic')
+        error_message_socket.on('error_message', function (data) {
+            generateInformation(data);
+        });
+
+        alarm_socket = io.connect("http://" + document.domain + ':' + location.port + '/dynamic')
+        alarm_socket.on("sound_alarm", function () {
+            play_alarm();
+        });
+
+        document.getElementById("stop_alarm").addEventListener("click", function () {
+            alarm_socket.emit("stop_alarm");
+        });
+    </script>
+
+    <!-- part deals with raw water tank -->
+    <script>
+        rw_socket = io.connect("http://" + document.domain + ':' + location.port + '/dynamic')
+        rw_socket.on('rw_data', function (data) {
+            document.getElementById("rw_water_level").innerHTML = "water level(L) : " + data.rw_water_level;
+            document.getElementById("rw_temperature").innerHTML = "temperature : " + data.rw_temperature;
+            document.getElementById("rw_pump_in_speed").innerHTML = "pump in speed : " + data.rw_pump_in_speed * 10;
+            document.getElementById("rw_flow_in").innerHTML = data.rw_flow_in ? "flow in: open": "flow in: close";
+            document.getElementById("rw_flow_out").innerHTML = data.rw_flow_out ? "flow out: open": "flow out: close";
+            document.getElementById("rw_running").innerHTML = data.rw_running ? "main control: start": "main control: close";
+        })
+
+
+        document.getElementById("rw_on").addEventListener("click", function () {
+            rw_socket.emit("rw_on");
+        })
+
+        document.getElementById("rw_off").addEventListener("click", function () {
+            rw_socket.emit("rw_off");
+        })
+
+        document.getElementById("rw_flow_in_open").addEventListener("click", function () {
+            rw_socket.emit("rw_flow_in_open");
+        })
+
+        document.getElementById("rw_flow_in_open").addEventListener("click", function () {
+            rw_socket.emit("rw_flow_in_open");
+        })
+
+        document.getElementById("rw_flow_out_open").addEventListener("click", function () {
+            rw_socket.emit("rw_flow_out_open");
+        })
+
+        document.getElementById("rw_flow_in_close").addEventListener("click", function () {
+            rw_socket.emit("rw_flow_in_close");
+        })
+
+        document.getElementById("rw_flow_out_close").addEventListener("click", function () {
+            rw_socket.emit("rw_flow_out_close");
+        })
+
+        document.getElementById("rw_form").addEventListener("submit", function () {
+            pump_in_speed = document.getElementById("pump_in_speed");
+            rw_socket.emit("pump_in_speed", pump_in_speed.value);
+        });
+
+    </script>
+
+    <!-- part deals with storage water tank -->
+    <script>
+        st_socket = io.connect("http://" + document.domain + ':' + location.port + '/dynamic')
+        st_socket.on('st_data', function (data) {
+            document.getElementById("st_water_level").innerHTML = "water level(L) : " + data.st_water_level;
+            document.getElementById("st_temperature").innerHTML = "temperature : " + data.st_temperature;
+            document.getElementById("st_pump_in_speed").innerHTML = "pump out speed : " + data.st_pump_out_speed * 10;
+            document.getElementById("st_running").innerHTML = data.st_running ? "main control: start" : "main control: close";
+            document.getElementById("st_flow_in").innerHTML = data.st_flow_in ? "flow in: open": "flow in: close";
+            document.getElementById("st_flow_out").innerHTML = data.st_flow_out ? "flow out: open": "flow out: close";
+            document.getElementById("st_automatic").innerHTML = data.st_automatic ? "automatic: on": "automatic: off";
+        })
+
+
+        document.getElementById("st_on").addEventListener("click", function () {
+            st_socket.emit("st_on");
+        })
+
+        document.getElementById("st_off").addEventListener("click", function () {
+            st_socket.emit("st_off");
+        })
+
+        document.getElementById("st_flow_in_open").addEventListener("click", function () {
+            st_socket.emit("st_flow_in_open");
+        })
+
+        document.getElementById("st_flow_in_open").addEventListener("click", function () {
+            st_socket.emit("st_flow_in_open");
+        })
+
+        document.getElementById("st_flow_out_open").addEventListener("click", function () {
+            st_socket.emit("st_flow_out_open");
+        })
+
+        document.getElementById("st_flow_in_close").addEventListener("click", function () {
+            st_socket.emit("st_flow_in_close");
+        })
+
+        document.getElementById("st_flow_out_close").addEventListener("click", function () {
+            st_socket.emit("st_flow_out_close");
+        })
+
+        document.getElementById("st_automatic_open").addEventListener("click", function () {
+            st_socket.emit("st_automatic_open");
+        })
+
+        document.getElementById("st_automatic_close").addEventListener("click", function () {
+            st_socket.emit("st_automatic_close");
+        })
+
+        document.getElementById("st_form").addEventListener("submit", function () {
+            pump_out_speed = document.getElementById("pump_out_speed");
+            st_socket.emit("pump_out_speed", pump_out_speed.value);
+        });
+    </script>
+
+    <!-- part deals with disinfection filter -->
+    <script>
+        const dis_socket = io.connect("http://" + document.domain + ':' + location.port + '/dynamic')
+        dis_socket.on('dis_data', function (data) {
+            document.getElementById("dis_water_level").innerHTML = "water level(L) : " + data.dis_water_level;
+            document.getElementById("dis_temperature").innerHTML = "temperature: " + data.dis_temperature;
+            document.getElementById("chlorine").innerHTML = "chlorine: " + data.dis_chlorine;
+            document.getElementById("expected_concentration").innerHTML = "expected concentration: " + data.dis_expected_concentration;
+            document.getElementById("real_concentration").innerHTML = "real concentration: " + data.dis_real_concentration;
+            document.getElementById("ph").innerHTML = "pH: " + data.dis_ph;
+            document.getElementById("dis_running").innerHTML = data.dis_running ? "main control: start": "main control: close";
+            document.getElementById("automatic").innerHTML = data.dis_is_automatic? "automatic: on": "automatic: off";
+            document.getElementById("dis_flow_in").innerHTML = data.dis_flow_in? "flow in: open": "flow in: close";
+            document.getElementById("dis_flow_out").innerHTML = data.dis_flow_out? "flow out: open": "flow out: close";
+        });
+
+        document.getElementById("dis_on").addEventListener("click", function () {
+            dis_socket.emit("dis_on");
+        })
+
+        document.getElementById("dis_off").addEventListener("click", function () {
+            dis_socket.emit("dis_off");
+        })
+
+        document.getElementById("dis_flow_in_open").addEventListener("click", function () {
+            dis_socket.emit("dis_flow_in_open");
+        })
+
+        document.getElementById("dis_flow_in_open").addEventListener("click", function () {
+            dis_socket.emit("dis_flow_in_open");
+        })
+
+        document.getElementById("dis_flow_out_open").addEventListener("click", function () {
+            dis_socket.emit("dis_flow_out_open");
+        })
+
+        document.getElementById("dis_flow_in_close").addEventListener("click", function () {
+            dis_socket.emit("dis_flow_in_close");
+        })
+
+        document.getElementById("dis_flow_out_close").addEventListener("click", function () {
+            dis_socket.emit("dis_flow_out_close");
+        })
+
+        document.getElementById("automatic_on").addEventListener("click", function (){
+            dis_socket.emit("automatic_on")
+        })
+
+        document.getElementById("automatic_off").addEventListener("click", function (){
+            dis_socket.emit("automatic_off")
+        })
+
+        document.getElementById("dis_cho_form").addEventListener("submit", function () {
+            chlorine = document.getElementById("chlorine_control");
+            dis_socket.emit("chlorine", chlorine.value);
+        });
+
+        document.getElementById("dis_con_form").addEventListener("submit", function () {
+            concentration = document.getElementById("concentration_control");
+            dis_socket.emit("concentration", concentration.value);
+        });
+
+
+    </script>
+
+    <!-- part deals with filter plc -->
+    <script>
+        const socket = io.connect("http://" + document.domain + ':' + location.port + '/dynamic')
+        let filter_running;
+        let sand_mode;
+        let gravel_mode;
+        let flow_in;
+        let flow_out;
+
+        socket.on('update_data', function (data) {
+            document.getElementById("water_level").innerHTML = "water_level: " + data.water_level;
+            document.getElementById("temperature").innerHTML = "temperature: " + data.temperature;
+            filter_running = data.filter_running;
+            sand_mode = data.sand_mode;
+            gravel_mode = data.gravel_mode;
+            flow_in = data.flow_in
+            flow_out = data.flow_out
+
+            document.getElementById("filter").innerHTML = filter_running ? "main control: start": "main control: close";
+
+            document.getElementById("flow_in").innerHTML = flow_in ? "flow in: open" : "flow in: close";
+
+            document.getElementById("flow_out").innerHTML = flow_out ? "flow out: open" : "flow out: close";
+
+            if (sand_mode === 2) {
+                document.getElementById("sand").innerHTML = "sand mode: strong";
+            } else if (sand_mode === 1) {
+                document.getElementById("sand").innerHTML = "sand mode: normal";
+            } else {
+                document.getElementById("sand").innerHTML = "sand mode: stop";
+            }
+
+            if (gravel_mode === 2) {
+                document.getElementById("gravel").innerHTML = "gravel mode: strong";
+            } else if (gravel_mode === 1) {
+                document.getElementById("gravel").innerHTML = "gravel mode: normal";
+            } else {
+                document.getElementById("gravel").innerHTML = "gravel mode: stop";
+            }
+
+            document.getElementById("turbidity").innerHTML = "turbidity: " + data.turbidity;
+            document.getElementById("dissolved_solids").innerHTML = "dissolved_solids: " + data.dissolved_solids;
+            document.getElementById("gravel_efficiency").innerHTML = "gravel_efficiency: " + data.gravel_efficiency;
+            document.getElementById("sand_efficiency").innerHTML = "sand_efficiency: " + data.sand_efficiency;
+        });
+
+        document.getElementById("filter_on").addEventListener("click", function () {
+            socket.emit('filter_on');
+        })
+
+        document.getElementById("filter_off").addEventListener("click", function () {
+            socket.emit('filter_off');
+        })
+
+        document.getElementById("sand_stop").addEventListener("click", function () {
+            socket.emit("sand_stop")
+        })
+
+        document.getElementById("sand_normal").addEventListener("click", function () {
+            socket.emit("sand_normal")
+        })
+
+        document.getElementById("sand_strong").addEventListener("click", function () {
+            socket.emit("sand_strong")
+        })
+
+        document.getElementById("gravel_stop").addEventListener("click", function () {
+            socket.emit("gravel_stop")
+        })
+
+        document.getElementById("gravel_normal").addEventListener("click", function () {
+            socket.emit("gravel_normal")
+        })
+
+        document.getElementById("gravel_strong").addEventListener("click", function () {
+            socket.emit("gravel_strong")
+        })
+
+        document.getElementById("flow_in_open").addEventListener("click", function () {
+            socket.emit("flow_in_open")
+        })
+
+        document.getElementById("flow_in_close").addEventListener("click", function () {
+            socket.emit("flow_in_close")
+        })
+
+        document.getElementById("flow_out_open").addEventListener("click", function () {
+            socket.emit("flow_out_open")
+        })
+
+        document.getElementById("flow_out_close").addEventListener("click", function () {
+            socket.emit("flow_out_close")
+        })
+    </script>
+</body>
+</html>
